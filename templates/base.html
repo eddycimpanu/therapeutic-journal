@@ -6,6 +6,18 @@
     <title>{% block title %}Jurnal terapeutic{% endblock %}</title>
 </head>
 <body>
+    <header>
+        <a href="{% url 'accounts:home' %}">Jurnal terapeutic</a>
+
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Deconectare</button>
+            </form>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Autentificare</a>
+        {% endif %}
+    </header>
     <main>
         {% block content %}{% endblock %}
     </main>

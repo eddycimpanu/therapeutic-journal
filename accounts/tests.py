@@ -73,3 +73,30 @@ class RegisterViewTests(TestCase):
         self.assertRedirects(response, reverse("accounts:home"))
         self.assertTrue(Patient.objects.filter(user__username="ana@example.com").exists())
         self.assertIn("_auth_user_id", self.client.session)
+        
+class LoginLogoutTests(TestCase):
+    def setUp(self):
+        RegistrationForm(data=registration_data()).save()
+
+    def test_login_with_email_in_any_case(self):
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"username": "ANA@example.com", "password": "o-parola-lunga-123"},
+        )
+        self.assertRedirects(response, reverse("accounts:home"))
+        self.assertIn("_auth_user_id", self.client.session)
+
+    def test_wrong_password_is_rejected(self):
+        response = self.client.post(
+            reverse("accounts:login"),
+            {"username": "ana@example.com", "password": "parola-gresita"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_logout_ends_session(self):
+        self.client.login(username="ana@example.com", password="o-parola-lunga-123")
+        response = self.client.post(reverse("accounts:logout"))
+
+        self.assertRedirects(response, reverse("accounts:home"))
+        self.assertNotIn("_auth_user_id", self.client.session)

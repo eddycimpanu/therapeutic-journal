@@ -4,6 +4,8 @@ from django.db import transaction
 
 from .models import CURRENT_CONSENT_VERSION, Patient, User
 
+from django.contrib.auth.forms import AuthenticationForm
+
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(label="Email")
@@ -31,3 +33,11 @@ class RegistrationForm(UserCreationForm):
         user.save()
         Patient.objects.create(user=user, consent_version=CURRENT_CONSENT_VERSION)
         return user
+    
+
+
+class EmailLoginForm(AuthenticationForm):
+    username = forms.EmailField(label="Email")
+
+    def clean_username(self):
+        return self.cleaned_data["username"].lower()
