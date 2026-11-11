@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Jurnal terapeutic</h1>
+
+{% if user.is_authenticated %}
+    <p>Ești conectat{% if user.patient %} ca {{ user.patient.code }}{% endif %}.</p>
+{% else %}
+    <p>Bine ai venit! Aici vei putea scrie zilnic cum te simți.</p>
+    <p><a href="{% url 'accounts:register' %}">Înscrie-te în studiu</a></p>
+{% endif %}
+{% endblock %}

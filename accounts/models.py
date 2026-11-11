@@ -11,6 +11,7 @@ class User(AbstractUser):
         max_length=20, choices=Role.choices, default=Role.PATIENT
     )
 
+CURRENT_CONSENT_VERSION = "v1"
 
 class Patient(models.Model):
     user = models.OneToOneField(
@@ -25,8 +26,8 @@ class Patient(models.Model):
         limit_choices_to={"role": User.Role.THERAPIST},
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
-    consent_version = models.CharField(max_length=20, default="v1")
-
+    consent_version = models.CharField(max_length=20, default=CURRENT_CONSENT_VERSION)
+    
     class Meta:
         verbose_name = "pacient"
         verbose_name_plural = "pacienți"

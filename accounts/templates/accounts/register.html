@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Înscriere – Jurnal terapeutic{% endblock %}
+
+{% block content %}
+<h1>Înscriere în studiu</h1>
+
+{% include "accounts/consent_v1.html" %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Creează contul</button>
+</form>
+{% endblock %}
