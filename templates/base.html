@@ -9,6 +9,7 @@
     <header>
         <a href="{% url 'accounts:home' %}">Jurnal terapeutic</a>
 
+        <a href="{% url 'accounts:dashboard' %}">Panoul meu</a>
         {% if user.is_authenticated %}
             <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
                 {% csrf_token %}
@@ -23,3 +24,4 @@
     </main>
 </body>
 </html>
+

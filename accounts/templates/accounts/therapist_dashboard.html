@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Pacienții mei – Jurnal terapeutic{% endblock %}
+
+{% block content %}
+<h1>Pacienții mei</h1>
+
+<ul>
+    {% for patient in patients %}
+        <li>{{ patient.code }} – înscris pe {{ patient.enrolled_at|date:"d.m.Y" }}</li>
+    {% empty %}
+        <li>Nu ai încă pacienți.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

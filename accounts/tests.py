@@ -70,7 +70,9 @@ class RegisterViewTests(TestCase):
     def test_registration_creates_patient_and_logs_in(self):
         response = self.client.post(reverse("accounts:register"), registration_data())
 
-        self.assertRedirects(response, reverse("accounts:home"))
+        self.assertRedirects(
+            response, reverse("accounts:dashboard"), fetch_redirect_response=False
+        )
         self.assertTrue(Patient.objects.filter(user__username="ana@example.com").exists())
         self.assertIn("_auth_user_id", self.client.session)
         
@@ -83,7 +85,9 @@ class LoginLogoutTests(TestCase):
             reverse("accounts:login"),
             {"username": "ANA@example.com", "password": "o-parola-lunga-123"},
         )
-        self.assertRedirects(response, reverse("accounts:home"))
+        self.assertRedirects(
+            response, reverse("accounts:dashboard"), fetch_redirect_response=False
+        )
         self.assertIn("_auth_user_id", self.client.session)
 
     def test_wrong_password_is_rejected(self):
@@ -100,3 +104,48 @@ class LoginLogoutTests(TestCase):
 
         self.assertRedirects(response, reverse("accounts:home"))
         self.assertNotIn("_auth_user_id", self.client.session)
+        
+class AccessTests(TestCase):
+    def setUp(self):
+        self.therapist = User.objects.create_user(
+            username="t1@example.com", password="test-pass", role=User.Role.THERAPIST
+        )
+        self.other_therapist = User.objects.create_user(
+            username="t2@example.com", password="test-pass", role=User.Role.THERAPIST
+        )
+        self.patient = make_patient("p@example.com")
+        self.patient.therapist = self.therapist
+        self.patient.save()
+
+    def test_anonymous_is_sent_to_login(self):
+        url = reverse("accounts:patient_dashboard")
+        response = self.client.get(url)
+        self.assertRedirects(response, f"{reverse('accounts:login')}?next={url}")
+
+    def test_patient_cannot_open_therapist_page(self):
+        self.client.force_login(self.patient.user)
+        response = self.client.get(reverse("accounts:therapist_dashboard"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_therapist_cannot_open_patient_page(self):
+        self.client.force_login(self.therapist)
+        response = self.client.get(reverse("accounts:patient_dashboard"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_therapist_sees_only_own_patients(self):
+        self.client.force_login(self.other_therapist)
+        response = self.client.get(reverse("accounts:therapist_dashboard"))
+        self.assertNotContains(response, self.patient.code)
+
+        self.client.force_login(self.therapist)
+        response = self.client.get(reverse("accounts:therapist_dashboard"))
+        self.assertContains(response, self.patient.code)
+
+    def test_dashboard_redirects_by_role(self):
+        self.client.force_login(self.therapist)
+        response = self.client.get(reverse("accounts:dashboard"))
+        self.assertRedirects(response, reverse("accounts:therapist_dashboard"))
+
+        self.client.force_login(self.patient.user)
+        response = self.client.get(reverse("accounts:dashboard"))
+        self.assertRedirects(response, reverse("accounts:patient_dashboard"))
