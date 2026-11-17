@@ -25,6 +25,7 @@ def register(request):
 
     return render(request, "accounts/register.html", {"form": form})
     
+    
 @patient_required
 def patient_dashboard(request):
     return render(
@@ -32,6 +33,7 @@ def patient_dashboard(request):
         "accounts/patient_dashboard.html",
         {"patient": request.user.patient},
     )
+
 
 
 @therapist_required
