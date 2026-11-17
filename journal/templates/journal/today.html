@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Intrarea de azi – Jurnal terapeutic{% endblock %}
+
+{% block content %}
+<h1>Intrarea de azi – {{ today|date:"d.m.Y" }}</h1>
+
+{% if is_update %}
+    <p>Ai scris deja azi. Poți modifica intrarea oricând, până la miezul nopții.</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvează</button>
+</form>
+{% endblock %}
