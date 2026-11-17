@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Istoricul meu – Jurnal terapeutic{% endblock %}
+
+{% block content %}
+<h1>Istoricul meu</h1>
+
+<p><a href="{% url 'journal:today' %}" class="btn btn-primary w-100">Scrie intrarea de azi</a></p>
+
+{% for entry in entries %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="h6 mb-0">{{ entry.date|date:"l, d.m.Y" }}</h2>
+                <span class="badge bg-primary">{{ entry.mood }}/10</span>
+            </div>
+            <p class="text-muted small mb-2">{{ entry.emotion_labels|join:", " }}</p>
+            {% if entry.text %}
+                <p class="mb-2">{{ entry.text|linebreaksbr }}</p>
+            {% endif %}
+            {% if entry.date == today %}
+                <a href="{% url 'journal:today' %}" class="btn btn-outline-primary btn-sm">Modifică</a>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>Nu ai scris încă nicio intrare.</p>
+{% endfor %}
+{% endblock %}

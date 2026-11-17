@@ -43,3 +43,7 @@ class JournalEntry(models.Model):
 
     def __str__(self):
         return f"{self.patient.code} – {self.date:%d.%m.%Y}"
+    
+    @property
+    def emotion_labels(self):
+        return [Emotion(value).label for value in self.emotions]

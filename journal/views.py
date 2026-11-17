@@ -28,3 +28,14 @@ def today_entry(request):
         "journal/today.html",
         {"form": form, "today": today, "is_update": entry is not None},
     )
+    
+@patient_required
+def history(request):
+    return render(
+        request,
+        "journal/history.html",
+        {
+            "entries": request.user.patient.entries.all(),
+            "today": timezone.localdate(),
+        },
+    )

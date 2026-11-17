@@ -112,3 +112,47 @@ class TodayEntryViewTests(TestCase):
 
         self.assertEqual(JournalEntry.objects.count(), 1)
         self.assertEqual(JournalEntry.objects.get().text, "Dimineața. Și seara.")
+        
+class HistoryViewTests(TestCase):
+    def setUp(self):
+        self.patient = make_patient()
+        self.url = reverse("journal:history")
+
+    def test_anonymous_is_sent_to_login(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"{reverse('accounts:login')}?next={self.url}")
+
+    def test_shows_only_own_entries(self):
+        make_entry(self.patient, text="Textul meu.")
+        make_entry(make_patient("altul@example.com"), text="Textul altcuiva.")
+
+        self.client.force_login(self.patient.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Textul meu.")
+        self.assertNotContains(response, "Textul altcuiva.")
+
+    def test_newest_entries_first(self):
+        make_entry(self.patient, date=date(2026, 11, 10))
+        make_entry(self.patient, date=date(2026, 11, 12))
+
+        self.client.force_login(self.patient.user)
+        response = self.client.get(self.url)
+
+        dates = [entry.date for entry in response.context["entries"]]
+        self.assertEqual(dates, [date(2026, 11, 12), date(2026, 11, 10)])
+
+    def test_emotions_are_shown_in_romanian(self):
+        make_entry(self.patient, emotions=["sadness"])
+
+        self.client.force_login(self.patient.user)
+        self.assertContains(self.client.get(self.url), "Tristețe")
+
+    def test_html_in_text_is_escaped(self):
+        make_entry(self.patient, text="<script>alert('x')</script>")
+
+        self.client.force_login(self.patient.user)
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "<script>alert")
+        self.assertContains(response, "&lt;script&gt;")

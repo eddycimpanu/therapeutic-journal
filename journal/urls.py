@@ -6,4 +6,5 @@ app_name = "journal"
 
 urlpatterns = [
     path("azi/", views.today_entry, name="today"),
+    path("istoric/", views.history, name="history"),
 ]
