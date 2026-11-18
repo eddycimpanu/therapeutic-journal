@@ -27,6 +27,8 @@ class Patient(models.Model):
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
     consent_version = models.CharField(max_length=20, default=CURRENT_CONSENT_VERSION)
+    reminders_enabled = models.BooleanField(default=True)
+    last_reminder_sent = models.DateField(null=True, blank=True)
     
     class Meta:
         verbose_name = "pacient"

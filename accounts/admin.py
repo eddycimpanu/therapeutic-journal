@@ -12,5 +12,5 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ("code", "therapist", "consent_version", "enrolled_at")
-    readonly_fields = ("code", "enrolled_at", "consent_version")
+    list_display = ("code", "therapist", "consent_version", "reminders_enabled", "enrolled_at")
+    readonly_fields = ("code", "enrolled_at", "consent_version", "last_reminder_sent")

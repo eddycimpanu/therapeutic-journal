@@ -12,6 +12,11 @@ from django.utils import timezone
 
 from .forms import JournalEntryForm
 
+from io import StringIO
+
+from django.core import mail
+from django.core.management import call_command
+
 
 def make_patient(username="p@example.com"):
     user = User.objects.create_user(username=username, password="test-pass")
@@ -156,3 +161,42 @@ class HistoryViewTests(TestCase):
 
         self.assertNotContains(response, "<script>alert")
         self.assertContains(response, "&lt;script&gt;")
+
+class SendRemindersTests(TestCase):
+    def setUp(self):
+        self.patient = make_patient("ana@example.com")
+        self.patient.user.email = "ana@example.com"
+        self.patient.user.save()
+
+    def run_command(self):
+        call_command("send_reminders", stdout=StringIO())
+
+    def test_sends_to_patient_without_entry_today(self):
+        self.run_command()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["ana@example.com"])
+
+    def test_skips_patient_who_wrote_today(self):
+        make_entry(self.patient, date=timezone.localdate())
+        self.run_command()
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_skips_patient_with_reminders_disabled(self):
+        self.patient.reminders_enabled = False
+        self.patient.save()
+        self.run_command()
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_does_not_send_twice_in_one_day(self):
+        self.run_command()
+        self.run_command()
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_email_has_link_but_no_journal_content(self):
+        make_entry(self.patient, date=date(2026, 11, 10), text="Ceva foarte personal.")
+        self.run_command()
+
+        body = mail.outbox[0].body
+        self.assertIn("/jurnal/azi/", body)
+        self.assertNotIn("Ceva foarte personal.", body)
+        self.assertNotIn(self.patient.code, body)

@@ -1,0 +1,9 @@
+Bună seara,
+
+Dacă ai câteva minute, poți scrie câteva rânduri despre ziua de azi:
+{{ link }}
+
+Dacă azi nu ai chef, e în regulă. Ne auzim mâine.
+
+Mulțumesc că participi la studiu,
+Eduardo

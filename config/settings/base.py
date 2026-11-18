@@ -79,3 +79,6 @@ LOGOUT_REDIRECT_URL = "accounts:home"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Jurnal terapeutic <noreply@localhost>")
