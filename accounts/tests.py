@@ -149,3 +149,9 @@ class AccessTests(TestCase):
         self.client.force_login(self.patient.user)
         response = self.client.get(reverse("accounts:dashboard"))
         self.assertRedirects(response, reverse("accounts:patient_dashboard"))
+        
+class PwaTests(TestCase):
+    def test_pages_link_the_manifest(self):
+        response = self.client.get(reverse("accounts:home"))
+        self.assertContains(response, 'rel="manifest"')
+        self.assertContains(response, "manifest.json")
