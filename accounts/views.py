@@ -11,6 +11,25 @@ from .models import User
 
 from django.utils import timezone
 
+from django.shortcuts import get_object_or_404
+
+@therapist_required
+def therapist_patient_detail(request, pk):
+    patient = get_object_or_404(request.user.patients, pk=pk)
+    entries = patient.entries.all()
+
+    chart_entries = list(reversed(entries))
+    chart_data = {
+        "labels": [entry.date.strftime("%d.%m") for entry in chart_entries],
+        "moods": [entry.mood for entry in chart_entries],
+    }
+
+    return render(
+        request,
+        "accounts/therapist_patient_detail.html",
+        {"patient": patient, "entries": entries, "chart_data": chart_data},
+    )
+    
 def home(request):
     return render(request, "accounts/home.html")
 

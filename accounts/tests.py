@@ -5,6 +5,9 @@ from .models import Patient, User
 from .forms import RegistrationForm
 
 from django.urls import reverse
+from datetime import date
+
+from journal.models import JournalEntry
 
 def make_patient(username):
     user = User.objects.create_user(username=username, password="test-pass")
@@ -155,3 +158,41 @@ class PwaTests(TestCase):
         response = self.client.get(reverse("accounts:home"))
         self.assertContains(response, 'rel="manifest"')
         self.assertContains(response, "manifest.json")
+        
+class TherapistPatientDetailTests(TestCase):
+    def setUp(self):
+        self.therapist = User.objects.create_user(
+            username="t1@example.com", password="test-pass", role=User.Role.THERAPIST
+        )
+        self.other_therapist = User.objects.create_user(
+            username="t2@example.com", password="test-pass", role=User.Role.THERAPIST
+        )
+        self.patient = make_patient("p@example.com")
+        self.patient.therapist = self.therapist
+        self.patient.save()
+        JournalEntry.objects.create(
+            patient=self.patient, date=date(2026, 11, 10), text="Textul pacientului.",
+            mood=6, emotions=["joy"],
+        )
+        self.url = reverse("accounts:therapist_patient_detail", args=[self.patient.pk])
+
+    def test_own_therapist_sees_entries(self):
+        self.client.force_login(self.therapist)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Textul pacientului.")
+
+    def test_other_therapist_gets_404(self):
+        self.client.force_login(self.other_therapist)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_patient_gets_403(self):
+        self.client.force_login(self.patient.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_chart_data_is_embedded_safely(self):
+        self.client.force_login(self.therapist)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'id="chart-data" type="application/json"')

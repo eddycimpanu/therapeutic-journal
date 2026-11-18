@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.code }} – Jurnal terapeutic{% endblock %}
+
+{% block content %}
+<p class="mb-2"><a href="{% url 'accounts:therapist_dashboard' %}">Înapoi la pacienți</a></p>
+<h1 class="mb-1">{{ patient.code }}</h1>
+<p class="text-bland mb-4">{{ entries|length }} intrări scrise</p>
+
+{% if entries %}
+    <section class="page mb-4">
+        <h2 class="h6 mb-3">Nota zilei, de la 1 la 10</h2>
+        <div style="position: relative; height: 240px;">
+            <canvas id="mood-chart" role="img" aria-label="Graficul notei zilei; valorile sunt în lista de mai jos."></canvas>
+        </div>
+    </section>
+
+    {% for entry in entries %}
+        <article class="entry">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                <h2 class="entry-date mb-0">{{ entry.date|date:"l, j F" }}</h2>
+                <span class="mood-dot" title="Nota zilei">
+                    {{ entry.mood }}<span class="visually-hidden"> din 10</span>
+                </span>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                {% for label in entry.emotion_labels %}
+                    <span class="tag">{{ label }}</span>
+                {% endfor %}
+            </div>
+            {% if entry.text %}
+                <p class="entry-text mb-0">{{ entry.text|linebreaksbr }}</p>
+            {% endif %}
+        </article>
+    {% endfor %}
+
+    {{ chart_data|json_script:"chart-data" }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const data = JSON.parse(document.getElementById("chart-data").textContent);
+        const css = getComputedStyle(document.documentElement);
+        const eucalipt = css.getPropertyValue("--eucalipt").trim();
+        const salvie = css.getPropertyValue("--salvie").trim();
+        const bland = css.getPropertyValue("--text-bland").trim();
+
+        new Chart(document.getElementById("mood-chart"), {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Nota zilei",
+                    data: data.moods,
+                    borderColor: eucalipt,
+                    backgroundColor: eucalipt,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.25,
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                interaction: { mode: "index", intersect: false },
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        min: 1,
+                        max: 10,
+                        ticks: { stepSize: 1, color: bland },
+                        grid: { color: salvie },
+                    },
+                    x: {
+                        ticks: { color: bland, maxRotation: 0, autoSkip: true },
+                        grid: { display: false },
+                    },
+                },
+            },
+        });
+    </script>
+{% else %}
+    <div class="page text-center">
+        <p class="mb-0">{{ patient.code }} nu a scris încă nicio intrare.</p>
+    </div>
+{% endif %}
+{% endblock %}

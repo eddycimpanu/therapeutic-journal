@@ -3,13 +3,18 @@
 {% block title %}Pacienții mei – Jurnal terapeutic{% endblock %}
 
 {% block content %}
-<h1>Pacienții mei</h1>
+<h1 class="mb-4">Pacienții mei</h1>
 
-<ul>
-    {% for patient in patients %}
-        <li>{{ patient.code }} – înscris pe {{ patient.enrolled_at|date:"d.m.Y" }}</li>
-    {% empty %}
-        <li>Nu ai încă pacienți.</li>
-    {% endfor %}
-</ul>
+{% for patient in patients %}
+    <a href="{% url 'accounts:therapist_patient_detail' patient.pk %}" class="entry d-block text-decoration-none text-reset">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="entry-date">{{ patient.code }}</span>
+            <span class="text-bland small">înscris pe {{ patient.enrolled_at|date:"j F Y" }}</span>
+        </div>
+    </a>
+{% empty %}
+    <div class="page text-center">
+        <p class="mb-0">Nu ai încă pacienți. Îi poți atribui din panoul de administrare.</p>
+    </div>
+{% endfor %}
 {% endblock %}
