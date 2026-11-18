@@ -4,15 +4,51 @@
 {% block title %}Intrarea de azi – Jurnal terapeutic{% endblock %}
 
 {% block content %}
-<h1>Intrarea de azi – {{ today|date:"d.m.Y" }}</h1>
+<h1 class="mb-1">Cum a fost azi?</h1>
+<p class="text-bland mb-4">
+    {{ today|date:"l, j F Y" }}
+    {% if is_update %}<br>Poți modifica intrarea până la miezul nopții.{% endif %}
+</p>
 
-{% if is_update %}
-    <p>Ai scris deja azi. Poți modifica intrarea oricând, până la miezul nopții.</p>
-{% endif %}
-
-<form method="post">
+<form method="post" class="page">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvează</button>
+
+    {{ form.text|as_crispy_field }}
+
+    <fieldset class="mb-4">
+        <legend class="form-label fs-6">{{ form.mood.label }}</legend>
+        <div class="mood-scale">
+            {% for radio in form.mood %}
+                <div>
+                    {{ radio.tag }}
+                    <label for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mood-ends">
+            <span>1 – foarte greu</span>
+            <span>10 – foarte bine</span>
+        </div>
+        {% for error in form.mood.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+    </fieldset>
+
+    <fieldset class="mb-4">
+        <legend class="form-label fs-6">{{ form.emotions.label }}</legend>
+        <div class="chips">
+            {% for checkbox in form.emotions %}
+                <div>
+                    {{ checkbox.tag }}
+                    <label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                </div>
+            {% endfor %}
+        </div>
+        {% for error in form.emotions.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary w-100">Salvează intrarea</button>
 </form>
 {% endblock %}

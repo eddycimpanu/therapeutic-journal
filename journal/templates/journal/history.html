@@ -3,27 +3,32 @@
 {% block title %}Istoricul meu – Jurnal terapeutic{% endblock %}
 
 {% block content %}
-<h1>Istoricul meu</h1>
-
-<p><a href="{% url 'journal:today' %}" class="btn btn-primary w-100">Scrie intrarea de azi</a></p>
+<h1 class="mb-4">Istoricul meu</h1>
 
 {% for entry in entries %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h2 class="h6 mb-0">{{ entry.date|date:"l, d.m.Y" }}</h2>
-                <span class="badge bg-primary">{{ entry.mood }}/10</span>
-            </div>
-            <p class="text-muted small mb-2">{{ entry.emotion_labels|join:", " }}</p>
-            {% if entry.text %}
-                <p class="mb-2">{{ entry.text|linebreaksbr }}</p>
-            {% endif %}
-            {% if entry.date == today %}
-                <a href="{% url 'journal:today' %}" class="btn btn-outline-primary btn-sm">Modifică</a>
-            {% endif %}
+    <article class="entry">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+            <h2 class="entry-date mb-0">{{ entry.date|date:"l, j F" }}</h2>
+            <span class="mood-dot" title="Nota zilei">
+                {{ entry.mood }}<span class="visually-hidden"> din 10</span>
+            </span>
         </div>
-    </div>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for label in entry.emotion_labels %}
+                <span class="tag">{{ label }}</span>
+            {% endfor %}
+        </div>
+        {% if entry.text %}
+            <p class="entry-text mb-3">{{ entry.text|linebreaksbr }}</p>
+        {% endif %}
+        {% if entry.date == today %}
+            <a href="{% url 'journal:today' %}" class="btn btn-outline-primary btn-sm">Modifică</a>
+        {% endif %}
+    </article>
 {% empty %}
-    <p>Nu ai scris încă nicio intrare.</p>
+    <div class="page text-center">
+        <p>Încă n-ai scris nimic. Prima intrare durează doar câteva minute.</p>
+        <a href="{% url 'journal:today' %}" class="btn btn-primary">Scrie intrarea de azi</a>
+    </div>
 {% endfor %}
 {% endblock %}

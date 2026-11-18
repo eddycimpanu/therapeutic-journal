@@ -3,8 +3,21 @@
 {% block title %}Jurnalul meu – Jurnal terapeutic{% endblock %}
 
 {% block content %}
-<h1>Jurnalul meu</h1>
-<p>Codul tău de participant: <strong>{{ patient.code }}</strong></p>
-<p><a href="{% url 'journal:today' %}">Scrie intrarea de azi</a></p> 
-<p><a href="{% url 'journal:history' %}">Istoricul meu</a></p>
+<section class="mb-4">
+    <h1>{{ greeting }}.</h1>
+    {% if wrote_today %}
+        <p class="text-bland">Ai scris deja azi. Poți reveni oricând până la miezul nopții, dacă vrei să mai adaugi ceva.</p>
+    {% else %}
+        <p class="text-bland">Câteva rânduri despre ziua de azi sunt de ajuns.</p>
+    {% endif %}
+</section>
+
+<div class="d-grid gap-2">
+    <a href="{% url 'journal:today' %}" class="btn btn-primary">
+        {% if wrote_today %}Deschide intrarea de azi{% else %}Scrie intrarea de azi{% endif %}
+    </a>
+    <a href="{% url 'journal:history' %}" class="btn btn-outline-primary">Istoricul meu</a>
+</div>
+
+<p class="text-bland small mt-4">Codul tău de participant: {{ patient.code }}</p>
 {% endblock %}

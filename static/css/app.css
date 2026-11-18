@@ -1,0 +1,227 @@
+/* Culorile și fonturile aplicației */
+:root {
+    --ceata: #EEF2F0;
+    --hartie: #FBFCFA;
+    --cerneala: #24312E;
+    --eucalipt: #4F7C6E;
+    --eucalipt-inchis: #3E6458;
+    --salvie: #DCE7E2;
+    --veioza: #E9B44C;
+    --text-bland: #5C6B67;
+
+    --font-scris: "Literata", Georgia, serif;
+    --font-interfata: "Figtree", system-ui, sans-serif;
+
+    /* Bootstrap preia culorile noastre */
+    --bs-body-bg: var(--ceata);
+    --bs-body-color: var(--cerneala);
+    --bs-body-font-family: var(--font-interfata);
+    --bs-link-color-rgb: 79, 124, 110;
+    --bs-link-hover-color-rgb: 62, 100, 88;
+    --bs-border-radius: 0.75rem;
+}
+
+body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+}
+
+h1, h2, .navbar-brand {
+    font-family: var(--font-scris);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    line-height: 1.2;
+}
+
+.text-bland {
+    color: var(--text-bland);
+}
+
+/* Meniul */
+.navbar-cozy {
+    background: var(--hartie);
+    border-bottom: 1px solid var(--salvie);
+}
+
+.navbar-cozy .navbar-brand {
+    color: var(--cerneala);
+}
+
+/* Butoanele */
+.btn {
+    border-radius: 999px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+}
+
+.btn-sm {
+    padding: 0.35rem 1rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--eucalipt);
+    --bs-btn-border-color: var(--eucalipt);
+    --bs-btn-hover-bg: var(--eucalipt-inchis);
+    --bs-btn-hover-border-color: var(--eucalipt-inchis);
+    --bs-btn-active-bg: var(--eucalipt-inchis);
+    --bs-btn-active-border-color: var(--eucalipt-inchis);
+    --bs-btn-focus-shadow-rgb: 79, 124, 110;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--eucalipt);
+    --bs-btn-border-color: var(--eucalipt);
+    --bs-btn-hover-bg: var(--eucalipt);
+    --bs-btn-hover-border-color: var(--eucalipt);
+    --bs-btn-active-bg: var(--eucalipt-inchis);
+    --bs-btn-focus-shadow-rgb: 79, 124, 110;
+}
+
+/* Câmpurile de formular */
+.form-control:focus {
+    border-color: var(--eucalipt);
+    box-shadow: 0 0 0 0.25rem rgba(79, 124, 110, 0.2);
+}
+
+textarea.form-control {
+    font-family: var(--font-scris);
+    line-height: 1.75;
+    background: var(--hartie);
+}
+
+/* Zona albă în care scrii */
+.page {
+    background: var(--hartie);
+    border: 1px solid var(--salvie);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+}
+
+/* Mesajele de confirmare */
+.alert-success {
+    background: var(--salvie);
+    border-color: var(--salvie);
+    color: var(--cerneala);
+}
+
+/* Nota zilei: 10 cerculețe */
+.mood-scale {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+@media (min-width: 576px) {
+    .mood-scale {
+        grid-template-columns: repeat(10, 1fr);
+    }
+}
+
+.mood-scale > div,
+.chips > div {
+    position: relative;
+}
+
+.mood-scale input,
+.chips input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.mood-scale label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid var(--salvie);
+    background: var(--hartie);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mood-scale input:checked + label {
+    background: var(--veioza);
+    border-color: var(--veioza);
+}
+
+.mood-ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-bland);
+}
+
+/* Emoțiile: etichete de apăsat */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chips label {
+    display: inline-block;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--salvie);
+    background: var(--hartie);
+    cursor: pointer;
+}
+
+.chips input:checked + label {
+    background: var(--eucalipt);
+    border-color: var(--eucalipt);
+    color: #fff;
+}
+
+/* Conturul vizibil pentru cine navighează cu tastatura */
+.mood-scale input:focus-visible + label,
+.chips input:focus-visible + label {
+    outline: 3px solid var(--eucalipt);
+    outline-offset: 2px;
+}
+
+/* Istoricul */
+.entry {
+    background: var(--hartie);
+    border: 1px solid var(--salvie);
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.entry-date {
+    font-size: 1.125rem;
+}
+
+.entry-text {
+    font-family: var(--font-scris);
+    line-height: 1.75;
+}
+
+.mood-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--veioza);
+    font-weight: 600;
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    background: var(--salvie);
+    font-size: 0.875rem;
+}

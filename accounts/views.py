@@ -9,6 +9,8 @@ from django.core.exceptions import PermissionDenied
 
 from .models import User
 
+from django.utils import timezone
+
 def home(request):
     return render(request, "accounts/home.html")
 
@@ -28,12 +30,24 @@ def register(request):
     
 @patient_required
 def patient_dashboard(request):
+    patient = request.user.patient
+    hour = timezone.localtime().hour
+    if 5 <= hour < 12:
+        greeting = "Bună dimineața"
+    elif 12 <= hour < 18:
+        greeting = "Bună ziua"
+    else:
+        greeting = "Bună seara"
+
     return render(
         request,
         "accounts/patient_dashboard.html",
-        {"patient": request.user.patient},
+        {
+            "patient": patient,
+            "greeting": greeting,
+            "wrote_today": patient.entries.filter(date=timezone.localdate()).exists(),
+        },
     )
-
 
 
 @therapist_required

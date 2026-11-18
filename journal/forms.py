@@ -4,23 +4,26 @@ from .models import Emotion, JournalEntry
 
 
 class JournalEntryForm(forms.ModelForm):
-    mood = forms.IntegerField(
-        min_value=1, max_value=10, label="Nota zilei (1–10)"
+    mood = forms.TypedChoiceField(
+        choices=[(n, str(n)) for n in range(1, 11)],
+        coerce=int,
+        widget=forms.RadioSelect,
+        label="Cum a fost ziua, de la 1 la 10?",
     )
     emotions = forms.MultipleChoiceField(
         choices=Emotion.choices,
         widget=forms.CheckboxSelectMultiple,
-        label="Ce emoții ai simțit azi? (1–3)",
+        label="Ce ai simțit azi? Alege între 1 și 3.",
     )
 
     class Meta:
         model = JournalEntry
         fields = ["text", "mood", "emotions"]
-        labels = {"text": "Cum ți-a fost ziua?"}
+        labels = {"text": "Ce s-a întâmplat azi?"}
         help_texts = {
-            "text": "Descrie ce s-a întâmplat azi, fără să numești ce ai simțit."
+            "text": "Scrie liber, fără să numești ce ai simțit. Emoțiile le alegi mai jos."
         }
-        widgets = {"text": forms.Textarea(attrs={"rows": 6})}
+        widgets = {"text": forms.Textarea(attrs={"rows": 7})}
 
     def clean_emotions(self):
         emotions = self.cleaned_data["emotions"]

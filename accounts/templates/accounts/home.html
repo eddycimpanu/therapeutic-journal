@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Jurnal terapeutic</h1>
-
-{% if user.is_authenticated %}
-    <p>Ești conectat{% if user.patient %} ca {{ user.patient.code }}{% endif %}.</p>
-{% else %}
-    <p>Bine ai venit! Aici vei putea scrie zilnic cum te simți.</p>
-    <p><a href="{% url 'accounts:register' %}">Înscrie-te în studiu</a></p>
-{% endif %}
+<section class="py-4">
+    {% if user.is_authenticated %}
+        <h1>Bine ai revenit.</h1>
+        <div class="d-grid mt-4">
+            <a class="btn btn-primary" href="{% url 'accounts:dashboard' %}">Mergi la panoul tău</a>
+        </div>
+    {% else %}
+        <h1>Un loc liniștit pentru câteva rânduri pe zi.</h1>
+        <p class="lead text-bland mt-3">
+            Scrii despre ziua ta, alegi cum te-ai simțit, și atât.
+            În studiu apari doar printr-un cod, niciodată cu numele tău.
+        </p>
+        <div class="d-grid gap-2 mt-4">
+            <a class="btn btn-primary" href="{% url 'accounts:register' %}">Înscrie-te în studiu</a>
+            <a class="btn btn-outline-primary" href="{% url 'accounts:login' %}">Am deja cont</a>
+        </div>
+    {% endif %}
+</section>
 {% endblock %}
