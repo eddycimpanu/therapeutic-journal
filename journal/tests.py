@@ -17,6 +17,10 @@ from io import StringIO
 from django.core import mail
 from django.core.management import call_command
 
+import csv
+import json
+import tempfile
+from pathlib import Path
 
 def make_patient(username="p@example.com"):
     user = User.objects.create_user(username=username, password="test-pass")
@@ -200,3 +204,35 @@ class SendRemindersTests(TestCase):
         self.assertIn("/jurnal/azi/", body)
         self.assertNotIn("Ceva foarte personal.", body)
         self.assertNotIn(self.patient.code, body)
+        
+class ExportDataTests(TestCase):
+    def setUp(self):
+        self.patient = make_patient("ana@example.com")
+        self.patient.user.email = "ana@example.com"
+        self.patient.user.save()
+        make_entry(self.patient, text="=SUM(A1:A2) o zi ciudată", emotions=["sadness", "fear"])
+
+    def export(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        call_command("export_data", output_dir=tmp.name, stdout=StringIO())
+        folder = Path(tmp.name)
+        return next(folder.glob("*.json")), next(folder.glob("*.csv"))
+
+    def test_json_has_code_and_no_email(self):
+        json_path, _ = self.export()
+        content = json_path.read_text(encoding="utf-8")
+        rows = json.loads(content)
+
+        self.assertEqual(rows[0]["patient_code"], self.patient.code)
+        self.assertEqual(rows[0]["emotions"], ["sadness", "fear"])
+        self.assertNotIn("ana@example.com", content)
+
+    def test_csv_has_no_email_and_is_formula_safe(self):
+        _, csv_path = self.export()
+        content = csv_path.read_text(encoding="utf-8-sig")
+        row = next(csv.DictReader(content.splitlines()))
+
+        self.assertNotIn("ana@example.com", content)
+        self.assertEqual(row["emotions"], "sadness;fear")
+        self.assertTrue(row["text"].startswith("'="))
